@@ -70,7 +70,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is consumed coin's tag, second is new transfered coin's commitment
-    transition transfer (public commitment: field, sk_tag: field, coin: credits.leo/credits, receiver: address) -> (public field, public field, private address) {
+    transition transfer (public commitment: field, coin: credits.leo/credits, receiver: address) -> (public field, private address) {
         // check commitment from this record
         let old_record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
         let old_commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
@@ -80,10 +80,6 @@ program unizexe_protocol.aleo {
         };
         let old_commitment: field = BHP1024::hash_to_field(old_commitment_preimage);
         assert_eq(old_commitment, commitment);
-
-        // handle tag
-        let tag_preimage: [field; 2] = [sk_tag, commitment];
-        let tag: field = Poseidon2::hash_to_field(tag_preimage);
 
         // generate new record by transfer
         // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
@@ -100,11 +96,11 @@ program unizexe_protocol.aleo {
         };
 
         let new_commitment: field = BHP1024::hash_to_field(commitment_preimage);
-        return (tag, new_commitment, self.caller);
+        return (new_commitment, self.caller);
     }
 
     // outputs first is consumed coin's tag, second is new transfered coin's commitment
-    transition public_transfer (public commitment: field, sk_tag: field, coin: credits.leo/credits, public receiver: address) -> (public field, public field, public address) {
+    transition public_transfer (public commitment: field, coin: credits.leo/credits, public receiver: address) -> (public field, public address) {
         // check commitment from this record
         let old_record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
         let old_commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
@@ -114,10 +110,6 @@ program unizexe_protocol.aleo {
         };
         let old_commitment: field = BHP1024::hash_to_field(old_commitment_preimage);
         assert_eq(old_commitment, commitment);
-
-        // handle tag
-        let tag_preimage: [field; 2] = [sk_tag, commitment];
-        let tag: field = Poseidon2::hash_to_field(tag_preimage);
 
         // generate new record by transfer
         // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
@@ -133,6 +125,6 @@ program unizexe_protocol.aleo {
         };
 
         let new_commitment: field = BHP1024::hash_to_field(commitment_preimage);
-        return (tag, new_commitment, self.caller);
+        return (new_commitment, self.caller);
     }
 }
