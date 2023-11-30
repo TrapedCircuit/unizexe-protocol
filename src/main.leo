@@ -6,11 +6,11 @@ program unizexe_protocol.aleo {
         The program can't compile real code, because the leo compiler doesn't support the assign var from call operatoration.
         Please use the build folder's code to deploy or execute.
 
-        The orginal record defination is:
+        The original record defination is:
         commitment = hash_bhp1024(to_bits_le![program_id, record_name, record_plaintext]);
         tag = hash_psd2([sk_tag, commitment]);
 
-        The inscribe record defination is:
+        The inscribed record defination is:
         commitment = hash_bhp1024(plaintext {program_id_field, record_name_field, record_plaintext_scalar});
         tag = hash_psd2(plaintext [sk_tag, commitment]);
     */
@@ -35,7 +35,7 @@ program unizexe_protocol.aleo {
     transition inscribe(data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, private address) {
         // generate new record by transfer
         // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
-        credits.leo/transfer_private(coin, self.caller, 1u64);
+        credits.leo/transfer_private(coin, self.caller, 1u64);// use minimum amount
 
         // handle commitment
         let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
@@ -54,7 +54,7 @@ program unizexe_protocol.aleo {
     transition public_inscribe (data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, public address) {
         // generate new record by transfer
         // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
-        credits.leo/transfer_private(coin, self.caller, 1u64);
+        credits.leo/transfer_private(coin, self.caller, 1u64); // use minimum amount
 
         // handle commitment
         let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
