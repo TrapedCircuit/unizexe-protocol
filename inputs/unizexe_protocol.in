@@ -1,0 +1,4 @@
+// The program input for unizexe_protocol/src/main.leo
+[test_tag_generate]
+sk_tag: field = 1field;
+commitment: field = 2field;
