@@ -32,7 +32,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is inscribed coin's commitment
-    transition inscribe(data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, private address) {
+    transition inscribe_private (data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, private address) {
         // generate new record by transfer
         // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
         credits.leo/transfer_private(coin, self.caller, 1u64);// use minimum amount
@@ -51,7 +51,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is inscribed coin's commitment
-    transition public_inscribe (data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, public address) {
+    transition inscribe (data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, public address) {
         // generate new record by transfer
         // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
         credits.leo/transfer_private(coin, self.caller, 1u64); // use minimum amount
@@ -70,7 +70,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is consumed coin's tag, second is new transfered coin's commitment
-    transition transfer (public commitment: field, coin: credits.leo/credits, receiver: address) -> (public field, private address) {
+    transition transfer_private (public commitment: field, coin: credits.leo/credits, receiver: address) -> public field {
         // check commitment from this record
         let old_record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
         let old_commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
@@ -96,11 +96,11 @@ program unizexe_protocol.aleo {
         };
 
         let new_commitment: field = BHP1024::hash_to_field(commitment_preimage);
-        return (new_commitment, self.caller);
+        return new_commitment;
     }
 
     // outputs first is consumed coin's tag, second is new transfered coin's commitment
-    transition public_transfer (public commitment: field, coin: credits.leo/credits, public receiver: address) -> (public field, public address) {
+    transition transfer (public commitment: field, coin: credits.leo/credits, public receiver: address) -> public field {
         // check commitment from this record
         let old_record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
         let old_commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
@@ -125,6 +125,6 @@ program unizexe_protocol.aleo {
         };
 
         let new_commitment: field = BHP1024::hash_to_field(commitment_preimage);
-        return (new_commitment, self.caller);
+        return new_commitment;
     }
 }
