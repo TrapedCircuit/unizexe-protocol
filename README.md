@@ -53,7 +53,7 @@ UniZexe的基础行为只有两个, 分别是 `inscribe` 和 `transfer`, 主要�
 
    `Record`是Aleo原生合约的货币单位，遵循的是**UTXO**的模型。所以当使用`Inscribe`后会消耗掉当前的`Record`，然后产生两个新的`Record`，输出的第一个`Record`就是拥有铭文的`Inscribed Record`。
 
-   <img src="https://files.catbox.moe/7envx1.png" alt="7envx1.png" style="zoom:50%;" />
+    ![7envx1.png](https://files.catbox.moe/7envx1.png)
 
    完成`inscribe`后的同时会生成两个**Output**，分别是对应**Inscription**的**Commitment**，以及持有人根据执行模式（Private or Public)分别对应的明文和密文地址。
 
