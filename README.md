@@ -53,7 +53,7 @@ UniZexe的基础行为只有两个, 分别是 `inscribe` 和 `transfer`, 主要�
 
    `Record`是Aleo原生合约的货币单位，遵循的是**UTXO**的模型。所以当使用`Inscribe`后会消耗掉当前的`Record`，然后产生两个新的`Record`，输出的第一个`Record`就是拥有铭文的`Inscribed Record`。
 
-    ![7envx1.png](https://files.catbox.moe/7envx1.png)
+   <img src="https://files.catbox.moe/7envx1.png" alt="7envx1.png" style="zoom:50%;" />
 
    完成`inscribe`后的同时会生成两个**Output**，分别是对应**Inscription**的**Commitment**，以及持有人根据执行模式（Private or Public)分别对应的明文和密文地址。
 
@@ -69,8 +69,39 @@ UniZexe的基础行为只有两个, 分别是 `inscribe` 和 `transfer`, 主要�
 
 ## Details(i.e. Why does it work)
 
-So, why does it work?
+要解释Why it works，我们要回到原生协议**ZEXE**上。
 
-我们必须从原始的ZEXE模型开始说起。
+我们知道在**ZEXE**中定义了`Record`为**UTXO**模型，并且使用了大量加密原语使得`Record`的流转能保证隐私性。所以为了实现**Colored Coin**这一目标，我们直接在`Record`上实现是最简单也最稳定安全的，所以我们需要构建一个索引`Record`的方式。
 
-在原生的
+![m8g8ip.png](https://files.catbox.moe/m8g8ip.png)
+
+当产生一笔带有`Record`的transaction的时候，因为其隐私性，在链上我们只能观测到`(tag, serial_number) =transition=> (cipher_record, commitment, checksum)`这样一个transition。
+
+- `tag = hash_psd2([sk_tag, commitment])` sk_tag是由用户view_key派生的。
+- `serial_number = some_op(private_key, commitment)`
+- `cipher_record = encrypt(view_key, plain_record)`
+- `commitment = hash_bhp1024(to_bits_le![program_id, record_name, record_plaintext])`
+- `checksum = hash_bhp1024(to_bit_le!(ciper_record))`
+
+很明显的，当我们说我们持有一个未消耗的`Record`的时候，我们实际上持有的就是链上存在该`Record`的`Commitment`并且没有对应的`tag`和`serial_number`的**inclusion proof**。
+
+所以很自然的我们最应该使用的是commitment作为我们inscription的索引方式。但是由于leo语言的限制，我们暂时没法对输入的`Record`进行`commitment`的计算，也就没法校验输入的`commitment`是否属于这个`Record`。所以我们构建了自己的`Commitment`，并且作为每次UTXO转换的输出。
+
+```rust
+  // handle commitment
+  let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
+
+  let commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
+      program_id_field: program_id_field(),
+      record_name_field: record_name_field(),
+      record_plaintext_scalar: record_scalar,
+  };
+
+  let commitment: field = BHP1024::hash_to_field(commitment_preimage);
+```
+
+这样，我们即实现了对原生货币`Record`的绑定。
+
+## Further(a way to implement off-chain and off-record ZEXE)
+
+*TODO*
