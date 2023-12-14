@@ -2,10 +2,6 @@ import credits.leo;
 // The 'unizexe_protocol' program.
 program unizexe_protocol.aleo {
     /*
-        !PAY ATTENTION:
-        The program can't compile real code, because the leo compiler doesn't support the assign var from call operatoration.
-        Please use the build folder's code to deploy or execute.
-
         The original record defination is:
         commitment = hash_bhp1024(to_bits_le![program_id, record_name, record_plaintext]);
         tag = hash_psd2([sk_tag, commitment]);
@@ -32,13 +28,11 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is inscribed coin's commitment
-    transition inscribe_private (data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, private address) {
-        // generate new record by transfer
-        // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
-        credits.leo/transfer_private(coin, self.caller, 1u64);// use minimum amount
+    transition inscribe_private (data: [[[u128; 32]; 32]; 32], coin: credits) -> (public field, private address) {
+        let (c1, c2): (credits, credits) = credits.leo/transfer_private(coin, self.caller, 1u64);// use minimum amount
 
         // handle commitment
-        let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
+        let record_scalar: scalar = Poseidon2::hash_to_scalar(c1);
 
         let commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
             program_id_field: program_id_field(),
@@ -51,13 +45,11 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is inscribed coin's commitment
-    transition inscribe (data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, public address) {
-        // generate new record by transfer
-        // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
-        credits.leo/transfer_private(coin, self.caller, 1u64); // use minimum amount
+    transition inscribe (data: [[[u128; 32]; 32]; 32], coin: credits) -> (public field, public address) {
+        let (c1, c2): (credits, credits) = credits.leo/transfer_private(coin, self.caller, 1u64); // use minimum amount
 
         // handle commitment
-        let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
+        let record_scalar: scalar = Poseidon2::hash_to_scalar(c1);
 
         let commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
             program_id_field: program_id_field(),
@@ -70,7 +62,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is consumed coin's tag, second is new transfered coin's commitment
-    transition transfer_private (public commitment: field, coin: credits.leo/credits, receiver: address) -> public field {
+    transition private_transfer (public commitment: field, coin: credits, receiver: address) -> public field {
         // check commitment from this record
         let old_record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
         let old_commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
@@ -81,13 +73,10 @@ program unizexe_protocol.aleo {
         let old_commitment: field = BHP1024::hash_to_field(old_commitment_preimage);
         assert_eq(old_commitment, commitment);
 
-        // generate new record by transfer
-        // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
-        credits.leo/transfer_private(coin, receiver, coin.microcredits);
-
+        let (c1, c2): (credits, credits) = credits.leo/transfer_private(coin, receiver, coin.microcredits);
 
         // handle commitment
-        let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
+        let record_scalar: scalar = Poseidon2::hash_to_scalar(c1);
 
         let commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
             program_id_field: program_id_field(),
@@ -100,7 +89,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is consumed coin's tag, second is new transfered coin's commitment
-    transition transfer (public commitment: field, coin: credits.leo/credits, public receiver: address) -> public field {
+    transition transfer (public commitment: field, coin: credits, public receiver: address) -> public field {
         // check commitment from this record
         let old_record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
         let old_commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
@@ -111,12 +100,10 @@ program unizexe_protocol.aleo {
         let old_commitment: field = BHP1024::hash_to_field(old_commitment_preimage);
         assert_eq(old_commitment, commitment);
 
-        // generate new record by transfer
-        // !need to get new coin, but the leo compiler doesn't support the assign var from call operatoration.
-        credits.leo/transfer_private(coin, receiver, coin.microcredits);
+        let (c1, c2): (credits, credits) = credits.leo/transfer_private(coin, receiver, coin.microcredits);
 
         // handle commitment
-        let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
+        let record_scalar: scalar = Poseidon2::hash_to_scalar(c1);
 
         let commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
             program_id_field: program_id_field(),
