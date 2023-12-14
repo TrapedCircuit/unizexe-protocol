@@ -11,7 +11,7 @@ program unizexe_protocol.aleo {
         tag = hash_psd2(plaintext [sk_tag, commitment]);
     */
 
-    mapping storage: field => address;
+    mapping store: field => address;
 
     struct InscribedRecordPreimage {
         program_id_field: field,
@@ -103,15 +103,15 @@ program unizexe_protocol.aleo {
 
         credits.leo/transfer_private_to_public(coin, receiver, 1u64);
 
-        return finalize (commitment, receiver);
+        return then finalize (commitment, receiver);
     }
 
     finalize lock (commitment: field, receiver: address) {
-        Mapping::set(storage, commitment, receiver);
+        Mapping::set(store, commitment, receiver);
     }
 
     transition withdraw (public commitment: field) -> public field {
-        let coin: credits = credits.leo/transfer_public_to_private(self, 1u64);
+        let coin: credits = credits.leo/transfer_public_to_private(self.signer, 1u64);
 
         // handle commitment
         let new_commitment: field = incription_commitment(coin);
@@ -120,9 +120,9 @@ program unizexe_protocol.aleo {
     }
 
     finalize withdraw (caller: address, commitment: field) {
-        let holder: address = Mapping::get(storage, commitment);
+        let holder: address = Mapping::get(store, commitment);
         assert(holder == caller);
 
-        Mapping::remove(storage, commitment);
+        Mapping::remove(store, commitment);
     }
 }
