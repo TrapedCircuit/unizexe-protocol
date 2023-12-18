@@ -110,8 +110,8 @@ program unizexe_protocol.aleo {
         Mapping::set(store, commitment, receiver);
     }
 
-    transition withdraw (public commitment: field) -> public field {
-        let coin: credits = credits.leo/transfer_public_to_private(self.signer, 1u64);
+    transition withdraw (public commitment: field, public receiver: address) -> public field {
+        let coin: credits = credits.leo/transfer_public_to_private(receiver, 1u64);
 
         // handle commitment
         let new_commitment: field = incription_commitment(coin);
