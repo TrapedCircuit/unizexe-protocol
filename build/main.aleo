@@ -21,8 +21,8 @@ mapping store:
 
 
 function inscribe_private:
-    input r0 as [[[u128; 32u32]; 32u32]; 32u32].private;
-    input r1 as credits.record;
+    input r0 as [[u128; 16u32]; 32u32].private;
+    input r1 as credits.aleo/credits.record;
     call credits.aleo/transfer_private r1 self.caller 1u64 into r2 r3;
     hash.psd2 r2 into r4 as scalar;
     cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r4 into r5 as InscribedRecordPreimage;
@@ -32,8 +32,8 @@ function inscribe_private:
 
 
 function inscribe:
-    input r0 as [[[u128; 32u32]; 32u32]; 32u32].private;
-    input r1 as credits.record;
+    input r0 as [[u128; 16u32]; 32u32].private;
+    input r1 as credits.aleo/credits.record;
     call credits.aleo/transfer_private r1 self.caller 1u64 into r2 r3;
     hash.psd2 r2 into r4 as scalar;
     cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r4 into r5 as InscribedRecordPreimage;
@@ -44,7 +44,7 @@ function inscribe:
 
 function private_transfer:
     input r0 as field.public;
-    input r1 as credits.record;
+    input r1 as credits.aleo/credits.record;
     input r2 as address.private;
     hash.psd2 r1 into r3 as scalar;
     cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r3 into r4 as InscribedRecordPreimage;
@@ -60,7 +60,7 @@ function private_transfer:
 
 function transfer:
     input r0 as field.public;
-    input r1 as credits.record;
+    input r1 as credits.aleo/credits.record;
     input r2 as address.public;
     hash.psd2 r1 into r3 as scalar;
     cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r3 into r4 as InscribedRecordPreimage;
@@ -76,7 +76,7 @@ function transfer:
 
 function lock:
     input r0 as field.public;
-    input r1 as credits.record;
+    input r1 as credits.aleo/credits.record;
     input r2 as address.public;
     hash.psd2 r1 into r3 as scalar;
     cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r3 into r4 as InscribedRecordPreimage;
@@ -97,13 +97,14 @@ finalize lock:
 
 function withdraw:
     input r0 as field.public;
-    call credits.aleo/transfer_public_to_private self.signer 1u64 into r1 r2;
-    hash.psd2 r1 into r3 as scalar;
-    cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r3 into r4 as InscribedRecordPreimage;
-    hash.bhp1024 r4 into r5 as field;
-    async withdraw r2 self.caller r0 into r6;
-    output r5 as field.public;
-    output r6 as unizexe_protocol.aleo/withdraw.future;
+    input r1 as address.public;
+    call credits.aleo/transfer_public_to_private r1 1u64 into r2 r3;
+    hash.psd2 r2 into r4 as scalar;
+    cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r4 into r5 as InscribedRecordPreimage;
+    hash.bhp1024 r5 into r6 as field;
+    async withdraw r3 self.caller r0 into r7;
+    output r6 as field.public;
+    output r7 as unizexe_protocol.aleo/withdraw.future;
 
 finalize withdraw:
     input r0 as credits.aleo/transfer_public_to_private.future;

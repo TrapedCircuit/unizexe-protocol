@@ -29,7 +29,7 @@ program unizexe_protocol.aleo {
         return 5364367152170003308090674155064976139835263083583673604434541896507872122573field;
     }
 
-    inline validate_coin(coin: credits, commitment: field) -> bool {
+    inline validate_coin(coin: credits.leo/credits, commitment: field) -> bool {
         // check commitment from this record
         let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
         let commitment_preimage: InscribedRecordPreimage = InscribedRecordPreimage {
@@ -41,7 +41,7 @@ program unizexe_protocol.aleo {
         return old_commitment == commitment;
     }
 
-    inline incription_commitment(coin: credits) -> field {
+    inline incription_commitment(coin: credits.leo/credits) -> field {
         // handle commitment
         let record_scalar: scalar = Poseidon2::hash_to_scalar(coin);
 
@@ -56,7 +56,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is inscribed coin's commitment
-    transition inscribe_private (data: [[[u128; 32]; 32]; 32], coin: credits) -> (public field, private address) {
+    transition inscribe_private (data: [[u128; 16]; 32], coin: credits.leo/credits) -> (public field, private address) {
         let (c1, c2): (credits, credits) = credits.leo/transfer_private(coin, self.caller, 1u64);// use minimum amount
 
         // handle commitment
@@ -65,7 +65,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is inscribed coin's commitment
-    transition inscribe (data: [[[u128; 32]; 32]; 32], coin: credits) -> (public field, public address) {
+    transition inscribe (data: [[u128; 16]; 32], coin: credits.leo/credits) -> (public field, public address) {
         let (c1, c2): (credits, credits) = credits.leo/transfer_private(coin, self.caller, 1u64); // use minimum amount
 
         // handle commitment
@@ -74,7 +74,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is consumed coin's tag, second is new transfered coin's commitment
-    transition private_transfer (public commitment: field, coin: credits, receiver: address) -> public field {
+    transition private_transfer (public commitment: field, coin: credits.leo/credits, receiver: address) -> public field {
         // check commitment from this record
         assert(validate_coin(coin, commitment));
 
@@ -86,7 +86,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is consumed coin's tag, second is new transfered coin's commitment
-    transition transfer (public commitment: field, coin: credits, public receiver: address) -> public field {
+    transition transfer (public commitment: field, coin: credits.leo/credits, public receiver: address) -> public field {
         // check commitment from this record
         assert(validate_coin(coin, commitment));
 
@@ -97,7 +97,7 @@ program unizexe_protocol.aleo {
         return new_commitment;
     }
 
-    transition lock (public commitment: field, coin: credits, public receiver: address) {
+    transition lock (public commitment: field, coin: credits.leo/credits, public receiver: address) {
         // check commitment from this record
         assert(validate_coin(coin, commitment));
 
