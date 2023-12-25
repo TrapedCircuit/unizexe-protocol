@@ -32,7 +32,7 @@ function inscribe_private:
 
 
 function inscribe:
-    input r0 as [[u128; 16u32]; 32u32].private;
+    input r0 as [[u128; 16u32]; 32u32].public;
     input r1 as credits.aleo/credits.record;
     call credits.aleo/transfer_private r1 self.caller 1u64 into r2 r3;
     hash.psd2 r2 into r4 as scalar;
