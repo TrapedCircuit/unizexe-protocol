@@ -13,42 +13,38 @@ UniZexe的基础行为只有两个, 分别是 `inscribe` 和 `transfer`, 主要�
 1. **Inscribe**
 
    ```rust
-   transition inscribe (data: [[[u128; 32]; 32]; 32], coin: credits.leo/credits) -> (public field, public address)
+   transition inscribe (data: [[u128; 16]; 32], coin: credits.leo/credits) -> (public field, public address)
    ```
 
    `inscribe`函数有两个**input**，分别是铭刻的内容`data`， 以及要铭刻的`Record`。
 
-   `data`是一个由`u128`组成的三维数组，每个`u128`都是由16个`u8`组成，所以每个`data`都是由`Vec<u8>`转化过来的。
+   `data`是一个由`u128`组成的二维数组，每个`u128`都是由16个`u8`组成，所以每个`data`都是由`Vec<u8>`转化过来的。
 
    ```rust
-   fn example_data_transform() {
-       // from Vec<u8> to [[[u128; 32]; 32]; 32]
-       let mut raw_data = vec![5u8, 6u8, 7u8, 8u8];
-       raw_data.resize(32 * 32 * 32, 0);
-       let raw_data = raw_data.chunks(16).map(|c| u128::from_le_bytes(c.try_into().unwrap())).collect::<Vec<u128>>();
-       let mut data = [[[0u128; 32]; 32]; 32];
-       for (i, num) in raw_data.iter().enumerate() {
-           let x = i / 32 / 32;
-           let y = i / 32 % 32;
-           let z = i % 32;
-           data[x][y][z] = *num;
-       }
+    pub fn to_vec(&self) -> Vec<u8> {
+        let mut vec = Vec::new();
+        for i in 0..32 {
+            for j in 0..16 {
+                vec.extend_from_slice(&self.0[i][j].to_le_bytes());
+            }
+        }
+        vec
+    }
 
-       // from [[[u128; 32]; 32]; 32] to Vec<u8>
-       let mut raw_data = Vec::new();
-       for x in 0..32 {
-           for y in 0..32 {
-               for z in 0..32 {
-                   raw_data.push(data[x][y][z]);
-               }
-           }
-       }
-       let mut data = Vec::new();
-       for num in raw_data {
-           let bytes = num.to_le_bytes();
-           data.extend_from_slice(&bytes);
-       }
-   }
+    pub fn from_slice(vec: &[u8]) -> anyhow::Result<Self> {
+        if vec.len() != 32 * 16 * 16 {
+            bail!("Invalid slice length")
+        }
+        let mut arr = [[0u128; 16]; 32];
+        for i in 0..32 {
+            for j in 0..16 {
+                let mut bytes = [0u8; 16];
+                bytes.copy_from_slice(&vec[(i * 16 + j) * 16..(i * 16 + j + 1) * 16]);
+                arr[i][j] = u128::from_le_bytes(bytes);
+            }
+        }
+        Ok(Self(arr))
+    }
    ```
 
    `Record`是Aleo原生合约的货币单位，遵循的是**UTXO**的模型。所以当使用`Inscribe`后会消耗掉当前的`Record`，然后产生两个新的`Record`，输出的第一个`Record`就是拥有铭文的`Inscribed Record`。
