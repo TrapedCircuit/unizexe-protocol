@@ -56,7 +56,7 @@ program unizexe_protocol.aleo {
     }
 
     // outputs first is inscribed coin's commitment
-    transition inscribe_private (data: [[u128; 16]; 32], coin: credits.leo/credits) -> (public field, private address) {
+    transition inscribe_private (public data: [[u128; 16]; 32], coin: credits.leo/credits) -> (public field, private address) {
         let (c1, c2): (credits, credits) = credits.leo/transfer_private(coin, self.caller, 1u64);// use minimum amount
 
         // handle commitment
