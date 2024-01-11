@@ -21,24 +21,28 @@ mapping store:
 
 
 function inscribe_private:
-    input r0 as [[u128; 16u32]; 32u32].private;
+    input r0 as [[u128; 16u32]; 32u32].public;
     input r1 as credits.aleo/credits.record;
-    call credits.aleo/transfer_private r1 self.caller 1u64 into r2 r3;
-    hash.psd2 r2 into r4 as scalar;
-    cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r4 into r5 as InscribedRecordPreimage;
-    hash.bhp1024 r5 into r6 as field;
-    output r6 as field.public;
+    gt r1.microcredits 0u64 into r2;
+    assert.eq r2 true;
+    call credits.aleo/transfer_private r1 self.caller 0u64 into r3 r4;
+    hash.psd2 r3 into r5 as scalar;
+    cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r5 into r6 as InscribedRecordPreimage;
+    hash.bhp1024 r6 into r7 as field;
+    output r7 as field.public;
     output self.caller as address.private;
 
 
 function inscribe:
     input r0 as [[u128; 16u32]; 32u32].public;
     input r1 as credits.aleo/credits.record;
-    call credits.aleo/transfer_private r1 self.caller 1u64 into r2 r3;
-    hash.psd2 r2 into r4 as scalar;
-    cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r4 into r5 as InscribedRecordPreimage;
-    hash.bhp1024 r5 into r6 as field;
-    output r6 as field.public;
+    gt r1.microcredits 0u64 into r2;
+    assert.eq r2 true;
+    call credits.aleo/transfer_private r1 self.caller 0u64 into r3 r4;
+    hash.psd2 r3 into r5 as scalar;
+    cast 2592153563941481818299150355295976261590486546629126588116998228059827156447field 5364367152170003308090674155064976139835263083583673604434541896507872122573field r5 into r6 as InscribedRecordPreimage;
+    hash.bhp1024 r6 into r7 as field;
+    output r7 as field.public;
     output self.caller as address.public;
 
 
