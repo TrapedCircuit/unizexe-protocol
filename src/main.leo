@@ -103,7 +103,7 @@ program unizexe_protocol.aleo {
         // check commitment from this record
         assert(validate_coin(coin, commitment));
 
-        credits.leo/transfer_private_to_public(coin, receiver, 1u64);
+        credits.leo/transfer_private_to_public(coin, receiver, 0u64);
 
         return then finalize (commitment, receiver);
     }
@@ -113,7 +113,7 @@ program unizexe_protocol.aleo {
     }
 
     transition withdraw (public commitment: field, public receiver: address) -> public field {
-        let coin: credits = credits.leo/transfer_public_to_private(receiver, 1u64);
+        let coin: credits = credits.leo/transfer_public_to_private(receiver, 0u64);
 
         // handle commitment
         let new_commitment: field = incription_commitment(coin);
